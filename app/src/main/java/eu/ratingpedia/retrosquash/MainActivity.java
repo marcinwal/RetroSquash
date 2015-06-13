@@ -26,6 +26,48 @@ import java.util.Random;
 
 public class MainActivity extends Activity {
 
+    Canvas canvas;
+    SquashCourtView squashCourtView;
+    //sound
+    private SoundPool soundPool;
+    int sample1 = -1;
+    int sample2 = -1;
+    int sample3 = -1;
+    int sample4 = -1;
+
+    //for display details
+    Display display;
+    Point size;
+    int screenWidth;
+    int screenHeight;
+
+    //game
+    int racketWidth;
+    int racketHeigth;
+    Point racketPosition;
+
+    Point ballPosition;
+    int ballWidth;
+
+    //for ball moves
+    boolean ballIsMovingLeft;
+    boolean ballIsMovingRight;
+    boolean ballIsMovingUp;
+    boolean isBallIsMovingDown;
+
+    //rocket move
+    boolean rocketIsMovingLeft;
+    boolean isRocketIsMovingRight;
+
+    //stats
+    long lastFrameTime;
+    int fps;
+    int scores;
+    int lives;
+
+
+
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
