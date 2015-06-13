@@ -200,20 +200,7 @@ public class MainActivity extends Activity {
             lastFrameTime = System.currentTimeMillis();
         }
 
-        public void pause(){
-            playingSquash = false;
-            try{
-                ourThread.join();
-            }catch (InterruptedException e){
 
-            }
-        }
-
-        public void resume(){
-            playingSquash = true;
-            ourThread = new Thread(this);
-            ourThread.start();
-        }
 
         private void drawCourt() {
             if (ourHolder.getSurface().isValid()){
@@ -331,5 +318,53 @@ public class MainActivity extends Activity {
             }
 
         }
+
+        public void pause(){
+            playingSquash = false;
+            try{
+                ourThread.join();
+            }catch (InterruptedException e){
+
+            }
+        }
+
+        public void resume(){
+            playingSquash = true;
+            ourThread = new Thread(this);
+            ourThread.start();
+        }
+    }
+
+    @Override
+    protected void onStop(){
+        super.onStop();
+
+        while(true){
+            squashCourtView.pause();
+            break;
+        }
+
+        finish();
+    }
+
+    @Override
+    protected void onPause(){
+        super.onPause();
+        squashCourtView.pause();
+    }
+
+    @Override
+    protected void onResume(){
+        super.onResume();
+        squashCourtView.resume();
+    }
+
+    public boolean onKeyDown(int keyCode,KeyEvent event){
+        if(keyCode == KeyEvent.KEYCODE_BACK){
+            squashCourtView.pause();
+            finish();
+            return true;
+        }
+        return true;
     }
 }
