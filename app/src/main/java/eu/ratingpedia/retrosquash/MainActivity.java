@@ -55,7 +55,7 @@ public class MainActivity extends Activity {
     boolean ballIsMovingLeft;
     boolean ballIsMovingRight;
     boolean ballIsMovingUp;
-    boolean isBallIsMovingDown;
+    boolean ballIsMovingDown;
 
     //rocket move
     boolean racketIsMovingLeft;
@@ -64,7 +64,7 @@ public class MainActivity extends Activity {
     //stats
     long lastFrameTime;
     int fps;
-    int scores;
+    int score;
     int lives;
 
 
@@ -133,7 +133,7 @@ public class MainActivity extends Activity {
             super(context);
             ourHolder = getHolder();
             paint = new Paint();
-            isBallIsMovingDown = true;
+            ballIsMovingDown = true;
 
             //ball sent randomly
             Random randInt = new Random();
@@ -186,6 +186,79 @@ public class MainActivity extends Activity {
                 ballIsMovingRight = true;
                 soundPool.play(sample1,1,1,0,0,1);
             }
+
+            //ball hit the boottom meaning player lost life
+            if(ballPosition.y > screenHeight - ballWidth){
+                lives--;
+                if(lives == 0){
+                    lives = 3;
+                    score = 0;
+                    soundPool.play(sample4,1,1,0,0,1);
+                }
+                ballPosition.y = 1 + ballWidth; //top of the screen again
+                Random randInt = new Random();
+                int startX = randInt.nextInt(screenWidth - ballWidth) + 1;
+                ballPosition.x = startX + ballWidth;
+                int ballDirection = randInt.nextInt(3);
+                switch (ballDirection){
+                    case 0:
+                        ballIsMovingLeft = true;
+                        ballIsMovingRight = false;
+                        break;
+                    case 1:
+                        ballIsMovingLeft = false;
+                        ballIsMovingRight = true;
+                        break;
+                    case 2:
+                        ballIsMovingLeft = false;
+                        ballIsMovingRight = false;
+                        break;
+                }
+            }
+
+            //hitting te top
+            if(ballPosition.y < 0){
+                ballIsMovingDown = true;
+                ballIsMovingUp = false;
+                ballPosition.y = 1;
+                soundPool.play(sample2,1,1,0,0,1);
+            }
+
+            //adjusting position depending on direction
+            if(ballIsMovingDown){
+                ballPosition.y += 6;
+            }
+
+            if(ballIsMovingUp){
+                ballPosition.y -= 10;
+            }
+
+            if(ballIsMovingLeft){
+                ballPosition.x -= 12;
+            }
+
+            if(ballIsMovingRight){
+                ballPosition.x += 12;
+            }
+
+            //ball hitting the racket
+            if(ballPosition.y + ballWidth >= (racketPosition.y - racketHeigth /2 )){
+                int halfRacket = racketWidth / 2 ;
+                if(ballPosition.x + ballWidth > (racketPosition.x - halfRacket)&& ballPosition.x - ballWidth < (racketPosition.x + halfRacket)){
+                    soundPool.play(sample3,1,1,0,0,1);
+                    score++;
+                    ballIsMovingUp = true;
+                    ballIsMovingDown = false;
+                    if (ballPosition.x > racketPosition.x){
+                        ballIsMovingRight = true;
+                        ballIsMovingLeft = false;
+                    }else {
+                        ballIsMovingRight = false;
+                        ballIsMovingLeft = true;
+                    }
+                }
+            }
+
         }
     }
 }
