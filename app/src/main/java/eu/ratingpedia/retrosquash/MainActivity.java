@@ -155,11 +155,82 @@ public class MainActivity extends Activity {
         }
 
         @Override
+        public boolean onTouchEvent(MotionEvent motionEvent){
+            switch (motionEvent.getAction() & MotionEvent.ACTION_MASK){
+                case MotionEvent.ACTION_DOWN:
+                    if(motionEvent.getX() >= screenWidth / 2){
+                        racketIsMovingRight = true;
+                        racketIsMovingLeft =false;
+                    } else{
+                        racketIsMovingRight = false;
+                        racketIsMovingLeft = true;
+                    }
+                    break;
+                case MotionEvent.ACTION_UP:
+                    racketIsMovingLeft = false;
+                    racketIsMovingLeft = false;
+                    break;
+            }
+            return true;
+        }
+
+        @Override
         public void run() {
             while(playingSquash){
                 updateCourt();
                 drawCourt();
                 controlFPS();
+            }
+        }
+
+        private void controlFPS() {
+            long timeThisFrame = (System.currentTimeMillis()-lastFrameTime);
+            long timeToSleep = 15 - timeThisFrame;
+            if(timeThisFrame > 0){
+                fps = (int)(1000/timeThisFrame);
+            }
+            if(timeToSleep>0){
+                try{
+                    ourThread.sleep(timeToSleep);
+
+                }catch (InterruptedException e){
+
+                }
+            }
+            lastFrameTime = System.currentTimeMillis();
+        }
+
+        public void pause(){
+            playingSquash = false;
+            try{
+                ourThread.join();
+            }catch (InterruptedException e){
+
+            }
+        }
+
+        public void resume(){
+            playingSquash = true;
+            ourThread = new Thread(this);
+            ourThread.start();
+        }
+
+        private void drawCourt() {
+            if (ourHolder.getSurface().isValid()){
+                canvas = ourHolder.lockCanvas();
+                canvas.drawColor(Color.BLACK);//background
+                paint.setColor(Color.argb(255, 255, 255, 255));
+                paint.setTextSize(45);
+                canvas.drawText("Score:"+score+" Lives:"+lives+" fps:"+fps,20,40,paint);
+
+                //drawing the racket
+                canvas.drawRect(racketPosition.x - (racketWidth/2),racketPosition.y-(racketHeigth/2),
+                                racketPosition.x + (racketWidth/2),racketPosition.y+racketHeigth,paint);
+                //ball
+                canvas.drawRect(ballPosition.x,ballPosition.y,
+                                ballPosition.x + ballWidth,ballPosition.y+ballWidth,paint);
+
+                ourHolder.unlockCanvasAndPost(canvas);
             }
         }
 
